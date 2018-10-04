@@ -1,12 +1,22 @@
-﻿
+﻿@model TheLocal.Models.Name
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+@if(Model.First != null && Model.Last != null) {
+    <p>
+        Hello @Model.First @Model.Last
+    </p>
+} else {
+    <p>
+        Please enter a first and last name.
+    </p>
+}
+
 <form method="POST">
     <label for="first">Name</label>
     <input type="text" id="first" name="first" placeholder="First" />
-    <input type="text" id="last"  name="last"  placeholder="Last"  />
+    <input type="text" id="last" name="last" placeholder="Last" />
     <input type="submit" />
 </form>

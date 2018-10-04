@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TheLocal.Models;
 
 namespace TheLocal.Controllers {
     public class HomeController : Controller {
@@ -8,8 +9,9 @@ namespace TheLocal.Controllers {
         }
 
         [HttpPost]
-        public ContentResult Index(string first, string last) {
-            return Content($"Hello {first}, {last}!");
+        public ViewResult Index(string first, string last) {
+            Name name = new Name() { First = first, Last = last };
+            return View(name);
         }
     }
 }
