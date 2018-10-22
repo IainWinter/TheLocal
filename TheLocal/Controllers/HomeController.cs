@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TheLocal.Models;
-using System.Data.SqlClient;
+using MySql.Data;
+using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 
 namespace TheLocal.Controllers {
@@ -9,30 +10,47 @@ namespace TheLocal.Controllers {
         public ViewResult Index() {
             IList<Name> list = new List<Name>();
 
-            SqlConnectionStringBuilder sb = new SqlConnectionStringBuilder {
-                DataSource = "avidata.cymuktbsfffe.us-east-2.rds.amazonaws.com",
+            MySqlConnectionStringBuilder sb = new MySqlConnectionStringBuilder {
+                Server = "avidata.cymuktbsfffe.us-east-2.rds.amazonaws.com",
                 UserID = "root",
                 Password = "rootroot",
-                Pooling = false
+                Pooling = false,
+                Database = "TheLocal"
             };
 
-            SqlConnection connection = new SqlConnection(sb.ConnectionString);
-            SqlCommand command = new SqlCommand("SELECT * FROM users;", connection);
+            MySqlConnection connection = new MySqlConnection(sb.ConnectionString);
+            MySqlCommand command = new MySqlCommand("SELECT * FROM users;", connection);
             connection.Open();
 
-            SqlDataReader reader = command.ExecuteReader(System.Data.CommandBehavior.CloseConnection);
-            string first = reader.GetString(1);
-            string last = reader.GetString(2);
+            MySqlDataReader reader = command.ExecuteReader(System.Data.CommandBehavior.CloseConnection);
+            
+            while(reader.Read()) {
+                string first = reader.GetString(1);
+                string last = reader.GetString(2);
+
+                list.Add(new Name() { First = first, Last = last });
+            }
 
             reader.Close();
-            list.Add(new Name() { First = first, Last = last });
             return View(list);
         }
 
         [HttpPost]
-        public ViewResult Index(string first, string last) {
-            Name name = new Name() { First = first, Last = last };
-            return View(name);
+        public RedirectToActionResult Index(string first, string last) {
+            MySqlConnectionStringBuilder sb = new MySqlConnectionStringBuilder {
+                Server = "avidata.cymuktbsfffe.us-east-2.rds.amazonaws.com",
+                UserID = "root",
+                Password = "rootroot",
+                Pooling = false,
+                Database = "TheLocal"
+            };
+
+            MySqlConnection connection = new MySqlConnection(sb.ConnectionString);
+            MySqlCommand command = new MySqlCommand($"INSERT INTO users (first, last) values('{first}', '{last}');", connection);
+            connection.Open();
+            command.ExecuteNonQuery();
+            connection.Close();
+            return RedirectToAction("Index");
         }
     }
 }
