@@ -5,4 +5,14 @@
 
 <!-- Put nav and other shared things here I guess-->
 
-@RenderBody()
+<html>
+    <head>
+        <link href="css/site.css" rel="stylesheet" />
+    </head>
+    <body>
+        @{ 
+            await Html.RenderPartialAsync("Navbar");
+            RenderBody();
+        }
+    </body>
+</html>

@@ -1,6 +1,6 @@
 ﻿namespace TheLocal.Models {
-    public struct Name {
+    public struct Post {
         public string First { get; set; }
-        public string Last { get; set; }
+        public string Text { get; set; }
     }
 }
