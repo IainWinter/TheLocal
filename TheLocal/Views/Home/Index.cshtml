@@ -1,4 +1,4 @@
-﻿@model IList<Name>
+﻿@model IList<Post>
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -6,16 +6,17 @@
 
 @{
     if (!(Model is null)) {
-        foreach (Name name in Model) {
-            <p>@name.First</p>
-            <p>@name.Last</p>
+        foreach (Post post in Model) {
+            <div class="post">
+                <a class="title">@post.Title</a>
+                <div class="description">
+                    <p class="text">@post.Text</p>
+                    <div class="info">
+                        <p class="user">@post.User</p>
+                        <p class="date">@post.Datetime</p>
+                    </div>
+                </div>
+            </div>
         }
-    }
+   }
 }
-
-<form method="POST">
-    <label for="first">Name</label>
-    <input type="text" id="first" name="first" placeholder="First" />
-    <input type="text" id="last" name="last" placeholder="Last" />
-    <input type="submit" />
-</form>

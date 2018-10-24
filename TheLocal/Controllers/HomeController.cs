@@ -3,54 +3,81 @@ using TheLocal.Models;
 using MySql.Data;
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
+using System;
+using TheLocal.Utility;
 
 namespace TheLocal.Controllers {
     public class HomeController : Controller {
         [HttpGet]
         public ViewResult Index() {
-            IList<Name> list = new List<Name>();
+            string q = "SELECT u.username, p.title, p.post, p.date FROM posts p inner join users u on p.id = u.id";
+            return View(MySqlConnectionHelper.GetData<Post>(q));
 
-            MySqlConnectionStringBuilder sb = new MySqlConnectionStringBuilder {
-                Server = "avidata.cymuktbsfffe.us-east-2.rds.amazonaws.com",
-                UserID = "root",
-                Password = "rootroot",
-                Pooling = false,
-                Database = "TheLocal"
-            };
 
-            MySqlConnection connection = new MySqlConnection(sb.ConnectionString);
-            MySqlCommand command = new MySqlCommand("SELECT * FROM users;", connection);
-            connection.Open();
+            //IList<Post> list = new List<Post>();
 
-            MySqlDataReader reader = command.ExecuteReader(System.Data.CommandBehavior.CloseConnection);
-            
-            while(reader.Read()) {
-                string first = reader.GetString(1);
-                string last = reader.GetString(2);
+            //MySqlConnectionStringBuilder sb = new MySqlConnectionStringBuilder {
+            //    Server   = "avidata.cymuktbsfffe.us-east-2.rds.amazonaws.com",
+            //    UserID   = "root",
+            //    Password = "rootroot",
+            //    Pooling  = false,
+            //    Database = "TheLocal"
+            //};
 
-                list.Add(new Name() { First = first, Last = last });
-            }
+            //string command_str = "SELECT u.username, p.title, p.post, p.date FROM posts p inner join users u on p.id = u.id";
 
-            reader.Close();
-            return View(list);
+            //MySqlConnection connection = new MySqlConnection(sb.ConnectionString);
+            //MySqlCommand command = new MySqlCommand(command_str, connection);
+            //connection.Open();
+
+            //MySqlDataReader reader = command.ExecuteReader(System.Data.CommandBehavior.CloseConnection);
+
+            //while (reader.Read()) {
+            //    string user = reader.GetString(0);
+            //    string title = reader.GetString(1);
+            //    string text  = reader.GetString(2);
+            //    DateTime datetime = reader.GetDateTime(3);
+
+            //    Name n = new Name() { First = user, Last = "" };
+            //    Post p = new Post() { Title = title, Text = text, User = n, Datetime = datetime };
+            //    list.Add(p);
+            //}
+
+            //reader.Close();
+            //return View(list);
+        }
+
+        [HttpGet]
+        public ViewResult Login() {
+            return View();
         }
 
         [HttpPost]
-        public RedirectToActionResult Index(string first, string last) {
+        public ActionResult Login(string user, string pass) {
             MySqlConnectionStringBuilder sb = new MySqlConnectionStringBuilder {
-                Server = "avidata.cymuktbsfffe.us-east-2.rds.amazonaws.com",
-                UserID = "root",
+                Server   = "avidata.cymuktbsfffe.us-east-2.rds.amazonaws.com",
+                UserID   = "root",
                 Password = "rootroot",
-                Pooling = false,
+                Pooling  = false,
                 Database = "TheLocal"
             };
 
             MySqlConnection connection = new MySqlConnection(sb.ConnectionString);
-            MySqlCommand command = new MySqlCommand($"INSERT INTO users (first, last) values('{first}', '{last}');", connection);
-            connection.Open();
-            command.ExecuteNonQuery();
-            connection.Close();
-            return RedirectToAction("Index");
+            MySqlCommand command = new MySqlCommand($"INSERT INTO users (username, pass) values('{user}', '{pass}');", connection);
+
+            ActionResult result;
+            try {
+                connection.Open();
+                command.ExecuteNonQuery();
+                result = RedirectToAction("Index");
+            } catch(Exception) {
+                result = Content("Username is already taken!");
+            } finally {
+                connection.Close();
+            }
+
+            Response.Cookies.Append("Name", user);
+            return result;
         }
     }
 }

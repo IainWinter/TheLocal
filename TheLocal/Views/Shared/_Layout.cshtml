@@ -3,16 +3,12 @@
     ViewData["Title"] = "Layout";
 }
 
-<!-- Put nav and other shared things here I guess-->
-
 <html>
     <head>
-        <link href="css/site.css" rel="stylesheet" />
+        <link href="/css/site.css" rel="stylesheet"/>
     </head>
     <body>
-        @{ 
-            await Html.RenderPartialAsync("Navbar");
-            RenderBody();
-        }
+        @await Html.PartialAsync("Navbar")
+        @RenderBody()
     </body>
 </html>
