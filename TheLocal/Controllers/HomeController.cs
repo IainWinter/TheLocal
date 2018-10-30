@@ -1,50 +1,34 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TheLocal.Models;
-using MySql.Data;
-using MySql.Data.MySqlClient;
-using System.Collections.Generic;
 using System;
+using System.Collections.Generic;
+using System.Security.Cryptography;
+using System.Text;
 using TheLocal.Utility;
+using System.Linq;
 
 namespace TheLocal.Controllers {
     public class HomeController : Controller {
         [HttpGet]
         public ViewResult Index() {
-            string q = "SELECT u.username, p.title, p.post, p.date FROM posts p inner join users u on p.id = u.id";
-            return View(MySqlConnectionHelper.GetData<Post>(q));
+            IList<Post> posts;
+            using (var db = new MySqlDbContext()) {
+                db.Database.EnsureCreated();
 
+                IQueryable<Post> result = 
+                    from post in db.Posts
+                    join user in db.Users on post.Id equals user.Id
+                    select new Post {
+                        Title = post.Title,
+                        Text = post.Text,
+                        User = user.Username,
+                        Date = post.Date
+                    };
 
-            //IList<Post> list = new List<Post>();
+                posts = new List<Post>(result);
+            }
 
-            //MySqlConnectionStringBuilder sb = new MySqlConnectionStringBuilder {
-            //    Server   = "avidata.cymuktbsfffe.us-east-2.rds.amazonaws.com",
-            //    UserID   = "root",
-            //    Password = "rootroot",
-            //    Pooling  = false,
-            //    Database = "TheLocal"
-            //};
-
-            //string command_str = "SELECT u.username, p.title, p.post, p.date FROM posts p inner join users u on p.id = u.id";
-
-            //MySqlConnection connection = new MySqlConnection(sb.ConnectionString);
-            //MySqlCommand command = new MySqlCommand(command_str, connection);
-            //connection.Open();
-
-            //MySqlDataReader reader = command.ExecuteReader(System.Data.CommandBehavior.CloseConnection);
-
-            //while (reader.Read()) {
-            //    string user = reader.GetString(0);
-            //    string title = reader.GetString(1);
-            //    string text  = reader.GetString(2);
-            //    DateTime datetime = reader.GetDateTime(3);
-
-            //    Name n = new Name() { First = user, Last = "" };
-            //    Post p = new Post() { Title = title, Text = text, User = n, Datetime = datetime };
-            //    list.Add(p);
-            //}
-
-            //reader.Close();
-            //return View(list);
+            return View(posts);
         }
 
         [HttpGet]
@@ -53,31 +37,32 @@ namespace TheLocal.Controllers {
         }
 
         [HttpPost]
-        public ActionResult Login(string user, string pass) {
-            MySqlConnectionStringBuilder sb = new MySqlConnectionStringBuilder {
-                Server   = "avidata.cymuktbsfffe.us-east-2.rds.amazonaws.com",
-                UserID   = "root",
-                Password = "rootroot",
-                Pooling  = false,
-                Database = "TheLocal"
-            };
+        public ActionResult Login(string username, string passcode) {
+            using (var db = new MySqlDbContext()) {
+                db.Database.EnsureCreated();
 
-            MySqlConnection connection = new MySqlConnection(sb.ConnectionString);
-            MySqlCommand command = new MySqlCommand($"INSERT INTO users (username, pass) values('{user}', '{pass}');", connection);
+                RandomGenerator random = new RandomGenerator(DateTime.UtcNow.Millisecond); //bad seed
 
-            ActionResult result;
-            try {
-                connection.Open();
-                command.ExecuteNonQuery();
-                result = RedirectToAction("Index");
-            } catch(Exception) {
-                result = Content("Username is already taken!");
-            } finally {
-                connection.Close();
+                string salt = random.GenerateString(15); //Random
+                string pepper = "P$t`bSo#yH{}R2o"; //Always the same, not stored in database. Store in appsettings.json
+
+                //Hash salt | pepper | passcode
+                SHA256 sha256 = SHA256.Create(); //bad hash use argon2
+                byte[] bytes = Encoding.UTF8.GetBytes(salt + pepper + passcode);
+                byte[] hash = sha256.ComputeHash(bytes);
+
+                User u = new User {
+                    Username = username,
+                    Passcode = hash,
+                    Salt = salt
+                };
+
+                db.Users.Add(u);
+
+                db.SaveChanges();
             }
 
-            Response.Cookies.Append("Name", user);
-            return result;
+            return Content("You've done it now.");
         }
     }
 }
