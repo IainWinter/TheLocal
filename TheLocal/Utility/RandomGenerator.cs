@@ -18,6 +18,5 @@ namespace TheLocal.Utility {
                              .Select(s => s[m_random.Next(s.Length)])
                              .ToArray());
         }
-
     }
 }

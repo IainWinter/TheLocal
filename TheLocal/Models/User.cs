@@ -11,11 +11,7 @@ namespace TheLocal.Models {
         public string Username { get; set; }
 
         [Required]
-        //Has to be 32 bytes
-        public byte[] Passcode { get; set; }
-
-        [Required]
-        [StringLength(15)]
-        public string Salt { get; set; }
+        [StringLength(84, MinimumLength = 84)]
+        public string Passcode { get; set; }
     }
 }

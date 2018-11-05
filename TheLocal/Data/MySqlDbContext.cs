@@ -6,6 +6,7 @@ namespace TheLocal {
     public class MySqlDbContext : DbContext {
         public DbSet<User> Users { get; set; }
         public DbSet<Post> Posts { get; set; }
+        public DbSet<Session> Sessions { get; set; }
 
         public MySqlDbContext() { }
 
