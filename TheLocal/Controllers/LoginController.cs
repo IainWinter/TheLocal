@@ -30,7 +30,7 @@ namespace TheLocal.Controllers {
                     string pepper = "P$t`bSo#yH{}R2o"; //Always the same, not stored in database. Store in appsettings.json
 
                     PasswordVerificationResult pvr =
-                        hasher.VerifyHashedPassword(user, user.Passcode, user.Passcode + pepper);
+                        hasher.VerifyHashedPassword(user, user.Passcode, passcode + pepper);
 
                     //Refresh hash if needed
                     if (pvr == PasswordVerificationResult.SuccessRehashNeeded) {
@@ -41,7 +41,7 @@ namespace TheLocal.Controllers {
                     else
                     if (pvr == PasswordVerificationResult.Success) {
                         RandomGenerator random = new RandomGenerator(DateTime.UtcNow.Millisecond); //bad seed
-                        string sessionString = random.GenerateString(16);
+                        string sessionString = random.GenerateString(32);
 
                         Session session =
                             (from s in db.Sessions
@@ -50,11 +50,12 @@ namespace TheLocal.Controllers {
 
                         if (session == null) {
                             db.Sessions.Add(new Session { Id = user.Id, SessionId = Encoding.UTF8.GetBytes(sessionString) });
-                            db.SaveChanges();
                         } else {
                             db.Sessions.Update(session);
                             session.SessionId = Encoding.UTF8.GetBytes(sessionString);
                         }
+
+                        db.SaveChanges();
 
                         return Content($"{username} has been logged in!");
                     }
@@ -71,7 +72,31 @@ namespace TheLocal.Controllers {
 
         [HttpPost]
         public ContentResult Register(string username, string passcode) {
-            return Content($"{username} has been registered!");
+            using (var db = new MySqlDbContext()) {
+                bool aUserAlready =
+                   (from u in db.Users
+                    where u.Username == username
+                    select u).Any();
+
+                if (!aUserAlready) {
+                    PasswordHasher<User> hasher = new PasswordHasher<User>();
+                    string pepper = "P$t`bSo#yH{}R2o"; //Always the same, not stored in database. Store in appsettings.json
+
+                    User user = new User {
+                        Username = username
+                    };
+
+                    string hash = hasher.HashPassword(user, passcode + pepper);
+                    user.Passcode = hash;
+
+                    db.Users.Add(user);
+                    db.SaveChanges();
+
+                    return Content($"{username} has been registered!");
+                }
+            }
+
+            return Content($"{username} has failed to register!");
         }
     }
 }
