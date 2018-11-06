@@ -26,7 +26,6 @@ namespace TheLocal {
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
@@ -41,8 +40,7 @@ namespace TheLocal {
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseCookiePolicy();
-
+            //app.UseCookiePolicy();
             app.UseMvc(routes => {
                 routes.MapRoute(
                     name: "default",

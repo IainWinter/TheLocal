@@ -3,8 +3,8 @@
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
-@{
+    
+@
     if (!(Model is null)) {
         foreach (Post post in Model) {
             <div class="post">

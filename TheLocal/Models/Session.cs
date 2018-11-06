@@ -11,7 +11,7 @@ namespace TheLocal.Models {
         public int Id { get; set; }
 
         [Required]
-        //16 bytes long always
-        public byte[] SessionId { get; set; }
+        [StringLength(32, MinimumLength = 32)]
+        public string SessionId { get; set; }
     }
 }
