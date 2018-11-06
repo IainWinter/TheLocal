@@ -12,9 +12,11 @@
             }
         }
     </div>
-    <div id="map" class="map center" style="width: 600px; height: 500px;"></div>
+    <div class="maplist">
+        <ul id="list" class="list"></ul>
+        <div id="map" class="map center"></div>
+    </div>
 </div>
-
 
 <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDqOBzjRTLtgWkBqjBEK6LBoALXjJSzB10&callback=initMap"></script>
 <script>
@@ -35,8 +37,13 @@
         ];
 
         for (let i = 0; i < locations.length; i++) {
-            let marker = addAddress(locations[i]);
+            addAddress(locations[i]);
+            addLocationToList(locations[i]);
         }
+    }
+
+    function addLocationToList(location) {
+        document.getElementById("list").innerHTML += "<li>" + location + "</li>";
     }
 
     function addAddress(address) {
