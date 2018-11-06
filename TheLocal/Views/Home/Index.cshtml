@@ -1,27 +1,15 @@
-﻿@model IList<Post>
+﻿@model User
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-    
-@{
-    if (!(Model is null))
-    {
-        foreach (Post post in Model)
-        {
-            <div class="post">
-                <a class="title">@post.Title</a>
-                <div class="description">
-                    <p class="text">@post.Text</p>
-                    <div class="info">
-                        <p class="user">@post.User</p>
-                        <p class="date">@post.Date</p>
-                    </div>
-                </div>
-            </div>
-        }
+
+@{ 
+    if(Model != null) {
+        <p>@Model.Username</p>
     }
 }
-            <div id="content" style="position:relative; top: 160px; left: 400px;">
-                <iframe width="800" height="600" frameborder="0" style="border:0" src="https://www.google.com/maps/embed/v1/search?q=umass&key=AIzaSyDqOBzjRTLtgWkBqjBEK6LBoALXjJSzB10" allowfullscreen></iframe>
-            </div>
+
+<div id="content">
+    <iframe width="800" height="600" frameborder="0" style="border:0" src="https://www.google.com/maps/embed/v1/search?q=umass&key=AIzaSyDqOBzjRTLtgWkBqjBEK6LBoALXjJSzB10" allowfullscreen></iframe>
+</div>
