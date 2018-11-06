@@ -5,8 +5,10 @@
 }
 
 @{
-    if (!(Model is null)) {
-        foreach (Post post in Model) {
+    if (!(Model is null))
+    {
+        foreach (Post post in Model)
+        {
             <div class="post">
                 <a class="title">@post.Title</a>
                 <div class="description">
@@ -18,5 +20,8 @@
                 </div>
             </div>
         }
-   }
+    }
 }
+            <div id="content" style="position:relative; top: 160px; left: 400px;">
+                <iframe width="800" height="600" frameborder="0" style="border:0" src="https://www.google.com/maps/embed/v1/search?q=umass&key=AIzaSyDqOBzjRTLtgWkBqjBEK6LBoALXjJSzB10" allowfullscreen></iframe>
+            </div>
