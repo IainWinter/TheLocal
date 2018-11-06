@@ -16,7 +16,7 @@ namespace TheLocal.Controllers {
         }
 
         [HttpPost]
-        public ContentResult Login(string username, string passcode) {
+        public IActionResult Login(string username, string passcode) {
             using (var db = new MySqlDbContext()) {
                 db.Database.EnsureCreated();
 
@@ -38,8 +38,7 @@ namespace TheLocal.Controllers {
                         user.Passcode = hasher.HashPassword(user, passcode + pepper);
                     } 
                     
-                    else
-                    if (pvr == PasswordVerificationResult.Success) {
+                    if (pvr == PasswordVerificationResult.Success || pvr == PasswordVerificationResult.SuccessRehashNeeded) {
                         RandomGenerator random = new RandomGenerator(DateTime.UtcNow.Millisecond); //bad seed
                         string sessionString = random.GenerateString(32);
 
@@ -49,20 +48,21 @@ namespace TheLocal.Controllers {
                              select s).FirstOrDefault();
 
                         if (session == null) {
-                            db.Sessions.Add(new Session { Id = user.Id, SessionId = Encoding.UTF8.GetBytes(sessionString) });
+                            db.Sessions.Add(new Session { Id = user.Id, SessionId = sessionString });
                         } else {
                             db.Sessions.Update(session);
-                            session.SessionId = Encoding.UTF8.GetBytes(sessionString);
+                            session.SessionId = sessionString;
                         }
 
                         db.SaveChanges();
 
-                        return Content($"{username} has been logged in!");
+                        Response.Cookies.Append("sessionid", sessionString);
+                        return RedirectToAction("Index", "Home");
                     }
                 }
             }
 
-            return Content($"{username} has failed to login!");
+            return View();
         }
 
         [HttpGet]
@@ -71,7 +71,7 @@ namespace TheLocal.Controllers {
         }
 
         [HttpPost]
-        public ContentResult Register(string username, string passcode) {
+        public IActionResult Register(string username, string passcode) {
             using (var db = new MySqlDbContext()) {
                 bool aUserAlready =
                    (from u in db.Users
@@ -92,11 +92,11 @@ namespace TheLocal.Controllers {
                     db.Users.Add(user);
                     db.SaveChanges();
 
-                    return Content($"{username} has been registered!");
+                    return RedirectToAction("Login");
                 }
             }
 
-            return Content($"{username} has failed to register!");
+            return View();
         }
     }
 }
