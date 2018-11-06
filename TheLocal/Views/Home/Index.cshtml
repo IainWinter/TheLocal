@@ -4,14 +4,15 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@{
-    if (Model != null) {
-        <p>@Model.Username</p>
-    }
-}
-
-<div id="content">
-    <div id="map" class="map" style="width: 600px; height: 500px;"></div>
+<div class="content">
+    <div class="greeting">
+        @{
+            if (Model != null) {
+                <p>Hello @Model.Username</p>
+            }
+        }
+    </div>
+    <div id="map" class="map center" style="width: 600px; height: 500px;"></div>
 </div>
 
 
