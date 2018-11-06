@@ -10,32 +10,20 @@ using Microsoft.AspNetCore.Http;
 
 namespace TheLocal.Controllers {
     public class HomeController : Controller {
-        private const string SESSIONID_COOKIE = "s";
-
         [HttpGet]
         public ViewResult Index() {
-            IList<Post> posts;
+            User user;
             using (var db = new MySqlDbContext()) {
                 db.Database.EnsureCreated();
 
-                IQueryable<Post> result =
-                    from post in db.Posts
-                    join user in db.Users on post.Id equals user.Id
-                    select new Post {
-                        Title = post.Title,
-                        Text = post.Text,
-                        User = user.Username,
-                        Date = post.Date
-                    };
-
-                posts = new List<Post>(result);
+                user =
+                   (from s in db.Sessions
+                    join u in db.Users on s.Id equals u.Id
+                    where s.SessionId == Request.Cookies["sessionid"]
+                    select u).FirstOrDefault();
             }
 
-            if(TempData.ContainsKey(SESSIONID_COOKIE)) {
-                Response.Cookies.Append(SESSIONID_COOKIE, (string)TempData[SESSIONID_COOKIE]);
-            }
-
-            return View(posts);
+            return View(user);
         }
 
         //Signup
