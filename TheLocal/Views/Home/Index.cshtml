@@ -4,12 +4,64 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@{ 
-    if(Model != null) {
+@{
+    if (Model != null) {
         <p>@Model.Username</p>
     }
 }
 
 <div id="content">
-    <iframe width="800" height="600" frameborder="0" style="border:0" src="https://www.google.com/maps/embed/v1/search?q=umass&key=AIzaSyDqOBzjRTLtgWkBqjBEK6LBoALXjJSzB10" allowfullscreen></iframe>
+    <div id="map" class="map" style="width: 500px; height: 400px;"></div>
 </div>
+
+
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDqOBzjRTLtgWkBqjBEK6LBoALXjJSzB10&callback=initMap"></script>
+<script>
+    let geocoder, infowindow, map;
+
+    function initMap() {
+        geocoder = new google.maps.Geocoder();
+        infowindo = new google.maps.InfoWindow();
+        map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 13,
+            center: new google.maps.LatLng(42.3732, -72.5199),
+            MapTypeId: google.maps.MapTypeId.ROADMAP
+        });
+
+        let locations = [
+            "Amherst Center",
+            "Glazed Amherst Ma"
+        ];
+
+        for (let i = 0; i < locations.length; i++) {
+            let marker = addAddress(locations[i]);
+        }
+    }
+
+    function addAddress(address) {
+        geocoder.geocode({ 'address': address }, addMarker);
+    }
+
+    function addMarker(results, status) {
+        if (status === 'OK') {
+            map.setCenter(results[0].geometry.location);
+            var marker = new google.maps.Marker({
+                map: map,
+                position: results[0].geometry.location
+            });
+
+            marker.addListener('click', function() {
+                if (marker.getAnimation() !== null) {
+                    marker.setAnimation(null);
+                } else {
+                    marker.setAnimation(google.maps.Animation.BOUNCE);
+                }
+            });
+        } else {
+            alert('Geocode was not successful for the following reason: ' + status);
+        }
+    }
+
+
+    
+</script>
