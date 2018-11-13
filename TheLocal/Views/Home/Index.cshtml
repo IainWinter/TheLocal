@@ -16,15 +16,18 @@
     <div class="maplist">
         <ul id="list" class="list"></ul>
         <div id="map" class="map center"></div>
-        <form>
-            <input type="text" id="searchInput" name="search" placeholder="Search" class="input-text autoclear" />
+        <form id="form1">
+            <input type="text" id="txtSearch" name="Search" value="" placeholder="Search" />
+            <br />
+            <br />
+            <asp:Button Text="Submit" OnClick="Submit" />
         </form>
     </div>
 
 
 </div>
 
-<script async defer src="https://maps.googleapis.com/maps/api/js?q=key=AIzaSyDqOBzjRTLtgWkBqjBEK6LBoALXjJSzB10&callback=initMap"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDqOBzjRTLtgWkBqjBEK6LBoALXjJSzB10&callback=initMap"></script>
 <script>
     let geocoder, infowindow, map;
 
