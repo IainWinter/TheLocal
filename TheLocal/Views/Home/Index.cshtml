@@ -7,7 +7,8 @@
 <div class="content">
     <div class="greeting">
         @{
-            if (Model != null) {
+            if (Model != null)
+            {
                 <p>Hello, @Model.Username</p>
             }
         }
@@ -15,10 +16,15 @@
     <div class="maplist">
         <ul id="list" class="list"></ul>
         <div id="map" class="map center"></div>
+        <form>
+            <input type="text" id="searchInput" name="search" placeholder="Search" class="input-text autoclear" />
+        </form>
     </div>
+
+
 </div>
 
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDqOBzjRTLtgWkBqjBEK6LBoALXjJSzB10&callback=initMap"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?q=key=AIzaSyDqOBzjRTLtgWkBqjBEK6LBoALXjJSzB10&callback=initMap"></script>
 <script>
     let geocoder, infowindow, map;
 
@@ -58,7 +64,7 @@
                 position: results[0].geometry.location
             });
 
-            marker.addListener('click', function() {
+            marker.addListener('click', function () {
                 if (marker.getAnimation() !== null) {
                     marker.setAnimation(null);
                 } else {
@@ -71,5 +77,5 @@
     }
 
 
-    
+
 </script>
